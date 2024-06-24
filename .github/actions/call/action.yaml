@@ -5,8 +5,16 @@ inputs:
     description: "The site to release"
     required: true
 
-  cloudfont-id:
+  cloudfront-id:
     description: "The Cloudfront ID to invalidate"
+    required: true
+
+  aws-account-id:
+    description: "The AWS account ID to assume"
+    required: true
+
+  aws-region:
+    description: "The AWS region to use"
     required: true
 
 runs:
@@ -15,8 +23,8 @@ runs:
     - name: Configure AWS credentials from PRODUCTION account
       uses: aws-actions/configure-aws-credentials@v4
       with:
-        role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github-action-role
-        aws-region: ${{ secrets.AWS_PROD_REGION }}
+        role-to-assume: arn:aws:iam::${{ inputs.aws-account-id }}:role/github-action-role
+        aws-region: ${{ inputs.aws-region }}
 
     - name: Release-docs 
       uses: dagger/dagger-for-github@v5
@@ -32,6 +40,6 @@ runs:
           --aws-access-key-id=env:AWS_ACCESS_KEY_ID \
           --aws-secret-access-key=env:AWS_SECRET_ACCESS_KEY \
           --aws-session-token=env:AWS_SESSION_TOKEN \
-          --cloudfront-id=${{ inputs.cloudfont-id }} \
+          --cloudfront-id=${{ inputs.cloudfront-id }} \
       env:
           AWS_REGION: ${{ secrets.AWS_PROD_REGION }}
